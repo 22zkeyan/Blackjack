@@ -33,9 +33,9 @@ namespace Blackjack
             return cards;
         }
 
-        static int[] CalcTotal(string[,] cards, string[] names)
+        static int CalcTotal(string[,] cards, string name)
         {
-            int[] totals = new int[cards.GetLength(0)];
+            int total = 0;
             int temp = 0; //temporary variable that will store the value of the current card
             for (int i = 0; i < cards.GetLength(0); i++) //loops through every name in the array
             {
@@ -46,7 +46,7 @@ namespace Blackjack
                     {
                         if (cards[i, j] == "Ace")
                         {
-                            Console.WriteLine($"{names[i]} has an ace in their cards, what value do they want it to be? (1 or 11)");
+                            Console.WriteLine($"{name} has an ace in their cards, what value do they want it to be? (1 or 11)");
                             temp = Convert.ToInt32(Console.ReadLine()!);
                         }
                         else if (cards[i, j] == "Jack" || cards[i, j] == "King" || cards[i, j] == "Queen")
@@ -54,10 +54,10 @@ namespace Blackjack
                             temp = 10;
                         }                        
                     }
-                    totals[i] += temp;
+                    total += temp;
                 }                
             }
-            return totals;
+            return total;
         }
 
         static string AddCard(string[,] cards, string[] names, string name) 
@@ -66,10 +66,10 @@ namespace Blackjack
             Resize2DArray(cards, cards.GetLength(0), cards.GetLength(1) + 1);
             string[] possibleCards = { "Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "King", "Queen" };
             cards[Array.IndexOf(names, name), cards.GetLength(1) - 1] = possibleCards[r.Next(0, possibleCards.Length)];
-            return cards[Array.IndexOf(names, name), cards.GetLength(1) - 1];
+            return cards[Array.IndexOf(names, name), cards.GetLength(1) - 1]; //returns the last card (the new card)
         }
 
-        static string[,] Resize2DArray(string[,] original, int newRows, int newCols)
+        static string[,] Resize2DArray(string[,] original, int newRows, int newCols) //courtesy of GitHub Copilot AI
         {
             int originalRows = original.GetLength(0);
             int originalCols = original.GetLength(1);
@@ -88,6 +88,7 @@ namespace Blackjack
 
         static void StandHit(string[,] cards, string[] names)
         {
+            int[] totals = new int[cards.GetLength(0)];
             for (int i = 0; i < names.Length; i++)
             {
                 Console.WriteLine($"{names[i]}, do you wish to stand or hit?");
@@ -98,14 +99,18 @@ namespace Blackjack
                     string new_card = AddCard(cards, names, names[i]);
                     Thread.Sleep(2000);
                     Console.WriteLine($"Your card is {new_card}");
-                    CalcTotal(cards, names);
+                    totals[i] = CalcTotal(cards, names[i]);
+                    Console.WriteLine($"{names[i]}, do you wish to stand or hit?");
+                    input = (Console.ReadLine()!).ToLower();
                 }
+                Console.WriteLine("Very well.");
+                Thread.Sleep(2000);
             }
         }
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to Blackjack! Here are the rules:" + 
+            Console.WriteLine("Welcome to Blackjack. Here are the rules:" + 
                 "\n\t- Each person starts out with two cards." + 
                 "\n\t- On your turn, you can choose to either take another card, or 'hit', or 'stand', where you don't take anymore cards." +
                 "\n\t- The aim of the game is to get the total value of your cards to be 21, or as close to that as possible." +
@@ -120,18 +125,9 @@ namespace Blackjack
             string[] names = InitPlayers(Convert.ToInt32(Console.ReadLine()!));
             string[,] cards = InitCards(names);
 
-            int[] totals = CalcTotal(cards, names);
-            //Console.WriteLine("\nCalculating totals...\n");
-            //for (int i = 0; i < names.Length; i++)
-            //{
-            //    Console.WriteLine($"{names[i]}'s total is {totals[i]}");
-            //}
+            //int[] totals = CalcTotal(cards, names);
 
-            //Console.WriteLine("Do you want another card? (anyone)");
-            //Console.Write("Enter the name of who wants another card: ");
-            //string name = Console.ReadLine()!;
-            //cards = AddCard(cards, names, name);
-            //Console.WriteLine($"{name} got a {cards[Array.IndexOf(names, name), cards.GetLength(1) - 1]}!");
+            StandHit(cards, names);
         }
     }
 }
