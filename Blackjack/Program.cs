@@ -97,6 +97,7 @@ namespace Blackjack
                     if (totals[i] > 21)
                     {
                         Console.WriteLine("Unfortunately, you got over 21, so you are now out.");
+                        input = "hit";
                     }
                     else
                     {
