@@ -32,34 +32,30 @@ namespace Blackjack
             }
             return cards;
         }
-
-        static int CalcTotal(string[,] cards, string name)
+        static int CalcTotal(string[,] cards, string[] names, string name)
         {
             int total = 0;
             int temp = 0; //temporary variable that will store the value of the current card
-            for (int i = 0; i < cards.GetLength(0); i++) //loops through every name in the array
+            int i = Array.IndexOf(names, name);
+            for (int j = 0; j < cards.GetLength(1); j++)
             {
-                for (int j = 0; j < cards.GetLength(1); j++)
+                bool success = int.TryParse(cards[i, j], out temp);
+                if (!success)
                 {
-                    bool success = int.TryParse(cards[i, j], out temp);
-                    if (!success)
+                    if (cards[i, j] == "Ace")
                     {
-                        if (cards[i, j] == "Ace")
-                        {
-                            Console.WriteLine($"{name} has an ace in their cards, what value do they want it to be? (1 or 11)");
-                            temp = Convert.ToInt32(Console.ReadLine()!);
-                        }
-                        else if (cards[i, j] == "Jack" || cards[i, j] == "King" || cards[i, j] == "Queen")
-                        {
-                            temp = 10;
-                        }                        
+                        Console.WriteLine($"{name} has an ace in their cards, what value do they want it to be? (1 or 11)");
+                        temp = Convert.ToInt32(Console.ReadLine()!);
                     }
-                    total += temp;
-                }                
-            }
+                    else if (cards[i, j] == "Jack" || cards[i, j] == "King" || cards[i, j] == "Queen")
+                    {
+                        temp = 10;
+                    }                        
+                }
+                total += temp;
+            }                
             return total;
         }
-
         static string AddCard(string[,] cards, string[] names, string name) 
         {
             Random r = new Random();
@@ -68,7 +64,6 @@ namespace Blackjack
             cards[Array.IndexOf(names, name), cards.GetLength(1) - 1] = possibleCards[r.Next(0, possibleCards.Length)];
             return cards[Array.IndexOf(names, name), cards.GetLength(1) - 1]; //returns the last card (the new card)
         }
-
         static string[,] Resize2DArray(string[,] original, int newRows, int newCols) //courtesy of GitHub Copilot AI
         {
             int originalRows = original.GetLength(0);
@@ -85,7 +80,6 @@ namespace Blackjack
 
             return result;
         }
-
         static void StandHit(string[,] cards, string[] names)
         {
             int[] totals = new int[cards.GetLength(0)];
@@ -99,15 +93,21 @@ namespace Blackjack
                     string new_card = AddCard(cards, names, names[i]);
                     Thread.Sleep(2000);
                     Console.WriteLine($"Your card is {new_card}");
-                    totals[i] = CalcTotal(cards, names[i]);
-                    Console.WriteLine($"{names[i]}, do you wish to stand or hit?");
-                    input = (Console.ReadLine()!).ToLower();
+                    totals[i] = CalcTotal(cards, names, names[i]);
+                    if (totals[i] > 21)
+                    {
+                        Console.WriteLine("Unfortunately, you got over 21, so you are now out.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{names[i]}, do you wish to stand or hit?");
+                        input = (Console.ReadLine()!).ToLower();
+                    }
                 }
                 Console.WriteLine("Very well.");
                 Thread.Sleep(2000);
             }
         }
-
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to Blackjack. Here are the rules:" + 
@@ -122,6 +122,7 @@ namespace Blackjack
             Thread.Sleep(2000); //allows Fred to sleep for 2 seconds
 
             Console.WriteLine("How many people are playing today?");
+            Console.Write("No. of people: ");
             string[] names = InitPlayers(Convert.ToInt32(Console.ReadLine()!));
             string[,] cards = InitCards(names);
 
