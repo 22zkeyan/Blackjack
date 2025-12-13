@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Xml.Linq;
 namespace Blackjack
 {
     internal class Program
@@ -16,7 +17,7 @@ namespace Blackjack
         }
         static string[,] InitCards(string[] names) //this function assigns the cards to each player
         {
-            Console.WriteLine("\nExcellent. Assigning cards now...");
+            Console.WriteLine("\nExcellent. Assigning cards now...\n");
             Thread.Sleep(2000); //2 seconds of sleep
 
             Random r = new Random();
@@ -42,72 +43,73 @@ namespace Blackjack
                 bool success = int.TryParse(cards[i, j], out temp);
                 if (!success)
                 {
-                    if (cards[i, j] == "Ace")
-                    {
-                        Console.WriteLine($"{name} has an ace in their cards, what value do they want it to be? (1 or 11)");
-                        temp = Convert.ToInt32(Console.ReadLine()!);
-                    }
-                    else if (cards[i, j] == "Jack" || cards[i, j] == "King" || cards[i, j] == "Queen")
-                    {
-                        temp = 10;
-                    }                        
+                    temp = DetermineCardVal(cards[i, j], name);
                 }
                 total += temp;
             }                
             return total;
         }
+        static int DetermineCardVal(string card, string name)
+        {
+            int temp = 0;
+            if (card == "Ace")
+            {
+                Console.WriteLine($"{name} has an ace in their cards, what value do they want it to be? (1 or 11)");
+                temp = Convert.ToInt32(Console.ReadLine()!);
+            }
+            else if (card == "Jack" || card == "King" || card == "Queen")
+            {
+                temp = 10;
+            }
+            return temp;
+        }
         static string AddCard(string[,] cards, string[] names, string name) 
         {
             Random r = new Random();
-            Resize2DArray(cards, cards.GetLength(0), cards.GetLength(1) + 1);
             string[] possibleCards = { "Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "King", "Queen" };
-            cards[Array.IndexOf(names, name), cards.GetLength(1) - 1] = possibleCards[r.Next(0, possibleCards.Length)];
-            return cards[Array.IndexOf(names, name), cards.GetLength(1) - 1]; //returns the last card (the new card)
-        }
-        static string[,] Resize2DArray(string[,] original, int newRows, int newCols) //courtesy of GitHub Copilot AI
-        {
-            int originalRows = original.GetLength(0);
-            int originalCols = original.GetLength(1);
-
-            string[,] result = new string[newRows, newCols];
-
-            int minRows = Math.Min(originalRows, newRows);
-            int minCols = Math.Min(originalCols, newCols);
-
-            for (int row = 0; row < minRows; row++)
-                for (int col = 0; col < minCols; col++)
-                    result[row, col] = original[row, col];
-
-            return result;
+            string new_card = possibleCards[r.Next(0, possibleCards.Length)];
+            return new_card; //returns the last card (the new card)
         }
         static void StandHit(string[,] cards, string[] names)
         {
             int[] totals = new int[cards.GetLength(0)];
             for (int i = 0; i < names.Length; i++)
             {
-                Console.WriteLine($"{names[i]}, do you wish to stand or hit?");
+                Console.WriteLine($"\n{names[i]}, do you wish to stand or hit?");
                 string input = (Console.ReadLine()!).ToLower();
                 while (input != "stand")
                 {
                     Console.WriteLine("You will now be given another card...");
                     string new_card = AddCard(cards, names, names[i]);
+                    int int_card = DetermineCardVal(new_card, names[i]);
                     Thread.Sleep(2000);
-                    Console.WriteLine($"Your card is {new_card}");
-                    totals[i] = CalcTotal(cards, names, names[i]);
+                    totals[i] += CalcTotal(cards, names, names[i]) + int_card;
                     if (totals[i] > 21)
                     {
                         Console.WriteLine("Unfortunately, you got over 21, so you are now out.");
-                        input = "hit";
+                        input = "stand";
+                    }
+                    else if (totals[i] == 21)
+                    {
+                        Console.WriteLine($"{names[i]} has exactly 21, so they are a winner");                        
                     }
                     else
                     {
-                        Console.WriteLine($"{names[i]}, do you wish to stand or hit?");
+                        Console.WriteLine($"{names[i]}, your card is {new_card}, your new total is {totals[i]}, do you wish to stand or hit?");
                         input = (Console.ReadLine()!).ToLower();
                     }
                 }
-                Console.WriteLine("Very well.");
-                Thread.Sleep(2000);
+                if (input == "stand")
+                {
+                    Console.WriteLine("Very well.");
+                    Thread.Sleep(2000);
+                }
             }
+        }
+        static void DetermineWinner(string[] names, int[] totals)
+        {
+            string[,] candidates = new string[names.Length, 2];
+
         }
         static void Main(string[] args)
         {
