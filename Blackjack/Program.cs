@@ -63,7 +63,7 @@ namespace Blackjack
             }
             return temp;
         }
-        static string AddCard(string[,] cards, string[] names, string name) 
+        static string AddCard() 
         {
             Random r = new Random();
             string[] possibleCards = { "Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "King", "Queen" };
@@ -77,17 +77,17 @@ namespace Blackjack
             {
                 Console.WriteLine($"\n{names[i]}, do you wish to stand or hit?");
                 string input = (Console.ReadLine()!).ToLower();
-                while (input != "stand")
+                while (input == "hit")
                 {
                     Console.WriteLine("You will now be given another card...");
-                    string new_card = AddCard(cards, names, names[i]);
+                    string new_card = AddCard();
                     int int_card = DetermineCardVal(new_card, names[i]);
                     Thread.Sleep(2000);
                     totals[i] += CalcTotal(cards, names, names[i]) + int_card;
                     if (totals[i] > 21)
                     {
                         Console.WriteLine("Unfortunately, you got over 21, so you are now out.");
-                        input = "stand";
+                        input = "abort";
                     }
                     else if (totals[i] == 21)
                     {
@@ -103,6 +103,10 @@ namespace Blackjack
                 {
                     Console.WriteLine("Very well.");
                     Thread.Sleep(2000);
+                }
+                else if (input == "abort")
+                {
+                    Console.WriteLine($"Farewell, {names[i]}");
                 }
             }
         }
