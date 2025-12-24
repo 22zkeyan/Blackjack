@@ -4,6 +4,35 @@ namespace Blackjack
 {
     internal class Program
     {
+        struct Card 
+        {
+            public string rank;
+            public string suit;
+
+            public Card(string rank_input, string suit_input)
+            {
+                rank = rank_input;
+                suit = suit_input;
+            }
+        }
+        struct Deck
+        {
+            public string[] suits = { "Hearts", "Diamonds", "Clubs", "Spades" };
+            public string[] ranks = { "Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King" };
+            public Card[] cards = new Card[52];
+
+            public Setup()
+            {
+                foreach (Card c in cards)
+                {
+
+                }
+            }
+            public Deal(string[] names)
+            {
+
+            }
+        }
         static string[] InitPlayers(int people) //this function adds the people's names to an array
         {
             string[] names = new string[people]; //creates an array of people the length of the amount of people playing
@@ -117,14 +146,17 @@ namespace Blackjack
         }
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to Blackjack. Here are the rules:" + 
+            Console.WriteLine("Welcome to Blackjack v0.97. Here are the rules:" + 
                 "\n\t- Each person starts out with two cards." + 
                 "\n\t- On your turn, you can choose to either take another card, or 'hit', or 'stand', where you don't take anymore cards." +
                 "\n\t- The aim of the game is to get the total value of your cards to be 21, or as close to that as possible." +
                 "\n\t- You can take as many cards as you wish until you feel you are close enough to 21, in which case you 'hold', or until you exceed 21" + 
                 "\n\t- If the total value of your cards exceeds 21, you are out." + 
-                "\n\t- An ace can be either be worth a 1 or 11, you choose what it's worth");
+                "\n\t- An ace can be either be worth a 1 or 11, you choose what it's worth" + 
+                "\n\t- Patch notes v0.97: totals are now calculated correctly and game is fully functional. Next patch will determine who wins the games.");
 
+            Console.Write("Confirm that you understand the rules: ");
+            Console.ReadLine();
             Console.WriteLine("\nNow we begin. Please wait...\n");
             Thread.Sleep(2000); //allows Fred to sleep for 2 seconds
 
